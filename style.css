@@ -1,0 +1,397 @@
+/* CSS Document */
+
+/* Fallback styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    padding: 30px;
+    background-color: #fff7e1;
+    color: #141414;
+    max-width: 1400px;
+    margin: auto;
+}
+
+/* Header styles */
+header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 40px;
+    margin-bottom: 35px;
+}
+
+header img {
+    width: 270px;
+    height: auto;
+    align-self: center;
+}
+
+#header-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: right;
+    flex: 1;
+}
+
+#header-text h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+#header-text h2 {
+    font-size: 1rem;
+}
+
+/* Progress bar + Score styles */
+.progress-section {
+    margin-bottom: 30px;
+}
+
+.score-text {
+    font-size: 1.3rem;
+    font-weight: 500;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+/* Progress bar fill styles */
+
+/* Positions the progress container */
+.progress-bar {
+    position: relative;
+    width: 100%;
+    height: 42px;
+    border: 3px solid #141414;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+/* Fills the progress bar. Uses absolute positioning */
+.progress-bar-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background-color: #77a8bb;
+    transition: width 0.3s ease;
+}
+
+/* Positions the progress text with a higher stack order */
+.progress-text {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    margin-top: 12px;
+    line-height: 42px;
+    font-size: 1.3rem;
+    font-weight: 500;
+}
+
+/* Main content styles */
+main#game-board {
+    width: 100%;
+    max-width: none;
+    height: auto;
+}
+
+.game-accordion {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 30px;
+    width: 100%;
+}
+
+.category-card {
+    background-color: #FFC907;
+    border: 3px solid #141414;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: none;
+}
+
+.game-accordion > .category-card {
+    border-radius: 14px !important;
+    border: none !important;
+}
+
+.game-accordion > .category-card:first-of-type,
+.game-accordion > .category-card:last-of-type {
+    border-radius: 14px !important;
+}
+
+.category-card .accordion-button,
+.category-card .accordion-collapse,
+.category-card .accordion-body {
+    border-radius: 0;
+}
+
+.category-card .accordion-header,
+.category-card .accordion-button,
+.category-card .accordion-body {
+    width: 100%;
+}
+
+.category-card .accordion-button {
+    min-height: 160px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 6px;
+    padding: 18px;
+    background-color: #FFC907;
+    color: #141414;
+    box-shadow: none;
+}
+
+.category-card .accordion-button:not(.collapsed) {
+    background-color: #FFC907;
+    color: #141414;
+    box-shadow: none;
+}
+
+.category-card .accordion-button:focus {
+    box-shadow: none;
+}
+
+.category-card .accordion-button::after {
+    margin-top: 8px;
+}
+
+.category-heading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.category-heading h1 {
+    text-align: center;
+    font-size: 2rem;
+    margin: 0;
+}
+
+.category-heading p {
+    display: none;
+}
+
+.category-card .accordion-body {
+    padding: 0 18px 18px;
+}
+
+.category-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.category-body .question-button {
+    width: 100%;
+    margin: 5px auto;
+}
+
+/* Desktop styles. Expands the accordions and disables accordion behavior */
+@media (min-width: 701px) {
+    .category-card .accordion-button {
+        pointer-events: none;
+        cursor: default;
+    }
+
+    .category-card .accordion-button::after {
+        display: none;
+    }
+
+    .category-card .accordion-collapse {
+        display: block !important;
+        visibility: visible !important;
+        height: auto !important;
+    }
+
+    .category-card .accordion-collapse.collapse:not(.show) {
+        display: block !important;
+    }
+
+    .category-card .accordion-body {
+        display: block;
+    }
+}
+
+/* Question screen styles */
+#question-screen {
+    background-color: #FFC907;
+    padding: 35px;
+    border-radius: 10px;
+}
+
+#question-screen button {
+    border-radius: 5px;
+    border: none;
+}
+
+button.back {
+    font-size: 1.25rem;
+    padding: 10px;
+}
+
+p#question-text {
+    font-size: 2.5rem;
+    font-weight: 500;
+}
+
+#answers {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+button.answer {
+    padding: 10px;
+    text-align: left;
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+p#answer-result {
+    margin-top: 10px;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.question-button.answered {
+    background: #003366;
+    color: white;
+    cursor: not-allowed;
+}
+
+/* Did You Know styles */
+#did-you-know {
+    margin-top: 30px;
+    border-left: 4px solid #003366;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    padding: 20px;
+}
+
+#did-you-know h3 {
+    margin: 5px 0;
+    font-weight: bold;
+}
+
+#did-you-know p {
+    margin: 0;
+    line-height: 1.6;
+    white-space: pre-line;
+}
+
+/* Buttons styles */
+.question-button {
+    background-color: #FFF7E1;
+    color: #141414;
+    border: none;
+    height: 62px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 2rem;
+    font-weight: 500;
+    transition: 0.2s;
+}
+
+.question-button:hover {
+    transform: scale(0.9);
+}
+
+/* Victory Screen Styles */
+body.victory {
+    background-color: #77a8bb;
+    color: white;
+}
+
+#victory-screen {
+    text-align: center;
+    padding: 50px;
+}
+
+#victory-screen h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+}
+
+#victory-screen h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+#victory-screen p {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+#charity-water-link {
+    font-size: 1.5rem;
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #FFC907;
+    color: #141414;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+/* Hide the Question and Victory screens */
+
+.hidden {
+    display: none;
+}
+
+
+/* Responsive Layout. Collapses accordions and enables accordion behavior */
+@media (max-width:1100px){
+    .game-accordion {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width:700px){
+    header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    #header-text {
+        text-align: center
+    }
+
+    #header-text h2 {
+        margin: auto;
+    }
+
+    .game-accordion {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .category-card .accordion-button {
+        min-height: 120px;
+        padding: 14px;
+    }
+
+    .category-heading h1 {
+        font-size: 2.1rem;
+    }
+
+    .category-heading p{
+        display: block;
+        margin: 6px 0 0;
+        font-size: 1.25rem;
+        font-weight: 500;
+    }
+}
