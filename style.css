@@ -7,12 +7,18 @@
     box-sizing: border-box;
 }
 
+/* Generic hidden helper used for screens and sections */
+.hidden {
+    display: none !important;
+}
+
 body {
     padding: 30px;
     background-color: #fff7e1;
     color: #141414;
     max-width: 1400px;
     margin: auto;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* Header styles */
@@ -48,16 +54,35 @@ header img {
     font-size: 1rem;
 }
 
+/* Difficulty selector styles */
+#difficulty-select {
+    font-size: 1.2rem;
+    padding: 6px 10px;
+    border-radius: 5px;
+    border: 2px solid #141414;
+    background-color: #fff7e1;
+    color: #141414;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
 /* Progress bar + Score styles */
 .progress-section {
     margin-bottom: 30px;
 }
 
-.score-text {
+.score-text, .timer-text {
     font-size: 1.3rem;
     font-weight: 500;
     margin-bottom: 10px;
     text-align: center;
+}
+
+.score-timer-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
 }
 
 /* Progress bar fill styles */
@@ -81,6 +106,12 @@ header img {
     height: 100%;
     background-color: #77a8bb;
     transition: width 0.3s ease;
+}
+
+/* Changes the color of the progress bar when full */
+.progress-bar-fill.victory {
+    background-color: #4fcb53;
+    transition: color 0.3s ease;
 }
 
 /* Positions the progress text with a higher stack order */
@@ -242,6 +273,10 @@ button.back {
     padding: 10px;
 }
 
+#question-title {
+    margin: 20px 0;
+}
+
 p#question-text {
     font-size: 2.5rem;
     font-weight: 500;
@@ -258,6 +293,16 @@ button.answer {
     text-align: left;
     font-size: 1.5rem;
     font-weight: 500;
+}
+
+button.answer:hover {
+    background-color: #003366;
+    color: white;
+}
+
+button.answer.correct {
+    background-color: #159a48;
+    color: white;
 }
 
 p#answer-result {
@@ -346,10 +391,69 @@ body.victory {
     font-weight: bold;
 }
 
-/* Hide the Question and Victory screens */
+/* Footer styles */
+footer {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 1.2rem;
+}
 
-.hidden {
-    display: none;
+/* Milestone message fade-in animation */
+#milestone-message {
+    opacity: 0;
+    transform: translateY(-8px);
+    animation: fadeInUp 420ms ease forwards;
+    display: block;
+    padding: 20px;
+    font-size: 1.2rem;
+    font-weight: 500;
+    text-align: center;
+    border-radius: 6px;
+
+    will-change: opacity, transform;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Animated hide/show for answer buttons only.
+   Keep the global `.hidden` (for screens) as `display:none`,
+   but override for answers so we can animate opacity/transform. */
+#answers .answer {
+    transition: opacity 240ms ease, transform 240ms ease, background-color 200ms ease, color 200ms ease, max-height 240ms ease, padding 200ms ease, margin 200ms ease;
+    will-change: opacity, transform;
+}
+
+#answers .answer.hidden {
+    /* override global .hidden display:none so the element remains in flow
+       and we can animate opacity/transform. */
+    display: block !important;
+    opacity: 0;
+    transform: translateX(10px);
+    pointer-events: none;
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin: 0;
+    overflow: hidden;
+}
+
+#answers .answer {
+    /* ensure visible answers have natural height when not hidden */
+    opacity: 1;
+    transform: none;
+    max-height: 200px;
+}
+
+/* Smooth color transitions for answer states */
+button.answer {
+    transition: background-color 200ms ease, color 200ms ease, transform 120ms ease;
+}
+
+button.answer.correct {
+    transition: background-color 300ms ease, color 300ms ease;
 }
 
 
@@ -393,5 +497,28 @@ body.victory {
         margin: 6px 0 0;
         font-size: 1.25rem;
         font-weight: 500;
+    }
+
+    #question-title {
+        margin: 20px 0;
+        font-size: 2.5rem;
+    }
+
+    p#question-text {
+        font-size: 1.8rem;
+    }
+
+    #milestone-message {
+        font-size: 1.1rem;
+        padding: 6px 10px;
+        text-align: center;
+    }
+}
+
+/* Accessibility: Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+        animation: none !important;
     }
 }

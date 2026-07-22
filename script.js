@@ -7,6 +7,128 @@ if (totalScore) {
     totalScore.textContent = `Score: ${score} / 7500`;
 }
 
+// Timer & Difficulty state
+const difficultySelect = document.getElementById('difficulty-select');
+const timerDisplay = document.getElementById('timerText');
+let currentDifficulty = difficultySelect ? difficultySelect.value || 'casual' : 'casual';
+const TIMER_PRESETS = {
+    casual: 0,
+    normal: 3 * 60 * 1000,
+    hard: 2 * 60 * 1000
+};
+let timerInterval = null;
+let timerRemainingMs = 0;
+
+function formatTime(ms) {
+    const totalSeconds = Math.max(0, Math.ceil(ms / 1000));
+    const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+    const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+    return `${minutes}:${seconds}`;
+}
+
+function updateTimerDisplay() {
+    if (!timerDisplay) return;
+    if (currentDifficulty === 'casual') {
+        timerDisplay.textContent = `Time: 00:00`;
+        return;
+    }
+    timerDisplay.textContent = `Time: ${formatTime(timerRemainingMs)}`;
+}
+
+function startTimer(durationMs) {
+    stopTimer();
+    if (!durationMs || durationMs <= 0) return;
+    timerRemainingMs = durationMs;
+    updateTimerDisplay();
+    timerInterval = setInterval(() => {
+        timerRemainingMs -= 250;
+        if (timerRemainingMs <= 0) {
+            timerRemainingMs = 0;
+            updateTimerDisplay();
+            stopTimer();
+            onTimerExpired();
+            return;
+        }
+        updateTimerDisplay();
+    }, 250);
+}
+
+function stopTimer() {
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+}
+
+function onTimerExpired() {
+    // Overall game timer expired -> end the game and show final score
+    alert("Time's up! The game has ended.");
+
+    // stop timer and disable difficulty selector
+    stopTimer();
+    if (difficultySelect) {
+        difficultySelect.disabled = true;
+        difficultySelect.setAttribute('aria-disabled', 'true');
+    }
+
+    const gameBoard = document.getElementById("game-board");
+    const victoryScreen = document.getElementById("victory-screen");
+    if (gameBoard && victoryScreen) {
+        gameBoard.classList.add("hidden");
+        gameBoard.style.display = "none";
+        gameBoard.setAttribute('aria-hidden', 'true');
+        victoryScreen.classList.remove("hidden");
+        victoryScreen.style.display = "block";
+        victoryScreen.setAttribute('aria-hidden', 'false');
+        document.body.classList.add("victory");
+        const milestoneMessage = document.getElementById("milestone-message");
+        if (milestoneMessage) milestoneMessage.remove();
+
+        const progressBarFill = document.getElementById("progressBarFill");
+        if (progressBarFill) progressBarFill.classList.add("victory");
+
+        const victoryH1 = document.querySelector("#victory-screen h1");
+        if (victoryH1) victoryH1.textContent = `Time's up!`;
+        const victoryH2 = document.querySelector("#victory-screen h2");
+        if (victoryH2) victoryH2.textContent = `You ran out of time!`;
+
+        const finalScoreElement = document.getElementById("final-score");
+        if (finalScoreElement) finalScoreElement.textContent = `${score}/7500`;
+    }
+}
+
+function resetGame() {
+    // Reset core state
+    completed = 0;
+    score = 0;
+    if (totalScore) totalScore.textContent = `Score: ${score} / 7500`;
+
+    // Reset question answered flags
+    Object.keys(questions).forEach(cat => {
+        Object.keys(questions[cat]).forEach(key => {
+            questions[cat][key].answered = false;
+        });
+        categoryDiscoveryCounts[cat] = 0;
+        updateCategoryProgress(cat);
+    });
+
+    // Reset board buttons
+    const boardButtons = document.querySelectorAll('.question-button');
+    boardButtons.forEach(btn => {
+        btn.disabled = false;
+        btn.classList.remove('answered');
+        if (btn.dataset && btn.dataset.value) btn.textContent = btn.dataset.value;
+    });
+
+    updateProgress();
+    stopTimer();
+    // Start timer for timed difficulties
+    if (currentDifficulty && TIMER_PRESETS[currentDifficulty]) {
+        if (currentDifficulty !== 'casual') startTimer(TIMER_PRESETS[currentDifficulty]);
+        else updateTimerDisplay();
+    }
+}
+
 // Define the questions, answers, and discoveries for each category and point value
 const questions = {
 
@@ -377,7 +499,7 @@ Object.keys(categoryDiscoveryElements).forEach(updateCategoryProgress);
 // Detects which button was clicked
 const buttons = document.querySelectorAll(".question-button");
 buttons.forEach(button => {
-    button.addEventListener ("click", () => {
+    button.addEventListener("click", () => {
         openQuestion(button);
     });
 });
@@ -437,8 +559,8 @@ function openQuestion(button) {
 
     const currentQuestion = questions[category][value];
 
-     // Checks if the selected question is already answered
-    if(currentQuestion.answered) {
+    // Checks if the selected question is already answered
+    if (currentQuestion.answered) {
         return;
     }
 
@@ -463,12 +585,15 @@ function openQuestion(button) {
     document.getElementById("did-you-know").classList.add("hidden");
     document.getElementById("discovery-text").textContent = "";
     result.textContent = ""
-    
+
     // Resets the buttons
     answerButtons.forEach(button => {
         button.disabled = false;
         button.classList.remove("correct");
         button.classList.remove("wrong");
+        // Ensure the button is visible when opening a question
+        button.classList.remove('hidden');
+        button.setAttribute('aria-hidden', 'false');
     });
 
     // Loads the new answers
@@ -483,10 +608,27 @@ function openQuestion(button) {
 
             const result = document.getElementById("answer-result");
             console.log("answer clicked", { index, answer: currentQuestion.answers[index], correctIndex: currentQuestion.correct });
-            
+
 
             // Disable every answer
             answerButtons.forEach(btn => btn.disabled = true)
+
+            // Hide all incorrect answers, keep the correct one visible
+            answerButtons.forEach((btn, i) => {
+                if (i !== currentQuestion.correct) {
+                    btn.classList.add('hidden');
+                    btn.disabled = true;
+                    button.setAttribute('aria-disabled', 'true');
+                    btn.setAttribute('aria-hidden', 'true');
+                } else {
+                    btn.classList.remove('hidden');
+                    btn.disabled = true;
+                    btn.classList.add('correct');
+                    btn.setAttribute('aria-disabled', 'true');
+                    btn.setAttribute('aria-hidden', 'false');
+                    if (typeof btn.focus === 'function') btn.focus();
+                }
+            });
 
             // Show the Did You Know section for both outcomes
             const discoverySection = document.getElementById("did-you-know");
@@ -498,9 +640,9 @@ function openQuestion(button) {
             activeQuestionButton.disabled = true;
             activeQuestionButton.classList.add("answered");
             activeQuestionButton.textContent = "✓"
-            completed ++;
+            completed++;
             currentQuestion.answered = true;
-            categoryDiscoveryCounts[category] ++;
+            categoryDiscoveryCounts[category]++;
             updateCategoryProgress(category);
             updateProgress();
 
@@ -511,22 +653,42 @@ function openQuestion(button) {
                 result.textContent = `Correct! +${value} points`
                 console.log("correct answer", { score, completed });
                 totalScore.textContent = `Score: ${score} / 7500`;
+                showMilestoneIfReached();
             } else {
                 button.classList.add("wrong");
                 answerButtons[currentQuestion.correct].classList.add("correct");
-                result.textContent = `Incorrect!`;
+                result.textContent = `Incorrect! The correct answer is: ${currentQuestion.answers[currentQuestion.correct]}`;
                 console.log("incorrect answer", { score, completed });
             }
 
+            // Ensure the correct button is always marked visible and highlighted
+            if (answerButtons[currentQuestion.correct]) {
+                answerButtons[currentQuestion.correct].classList.remove('hidden');
+                answerButtons[currentQuestion.correct].setAttribute('aria-hidden', 'false');
+                answerButtons[currentQuestion.correct].classList.add('correct');
+            }
+
         };
-    },2000);
+    }, 2000);
 }
 
 // When the "Back" button is pressed
-function finishQuestion(){
+function finishQuestion() {
     const gameBoard = document.getElementById("game-board");
     const questionScreen = document.getElementById("question-screen");
     const victoryScreen = document.getElementById("victory-screen");
+
+    // Restore answer buttons visibility/state when leaving a question
+    const answerButtons = document.querySelectorAll("#answers .answer");
+    if (answerButtons) {
+        answerButtons.forEach(btn => {
+            btn.classList.remove('hidden');
+            btn.setAttribute('aria-hidden', 'false');
+            btn.disabled = false;
+            btn.classList.remove('correct');
+            btn.classList.remove('wrong');
+        });
+    }
 
     if (gameBoard && questionScreen) {
         questionScreen.classList.add("hidden");
@@ -536,22 +698,110 @@ function finishQuestion(){
     }
 
     // Check if all questions have been completed and show the victory screen if so
-    if(completed === 25){
+    if (completed === 25) {
+        // stop overall timer when game ends
+        stopTimer();
+        // disable difficulty selector
+        if (difficultySelect) {
+            difficultySelect.disabled = true;
+            difficultySelect.setAttribute('aria-disabled', 'true');
+        }
+
+        const milestoneMessage = document.getElementById("milestone-message");
+        if (milestoneMessage) milestoneMessage.remove();
+
         document.body.classList.add("victory");
         gameBoard.classList.add("hidden");
         questionScreen.classList.add("hidden");
         victoryScreen.classList.remove("hidden");
+
         const finalScoreElement = document.getElementById("final-score");
-        if (finalScoreElement) {
-            finalScoreElement.textContent = `${score}/7500`;
+        if (finalScoreElement) finalScoreElement.textContent = `${score}/7500`;
+
+        // Update the victory screen message based on whether the player ran out of time or completed all questions
+        const victoryH1 = document.querySelector("#victory-screen h1");
+        if (victoryH1) victoryH1.textContent = `Congratulations!`;
+        const victoryH2 = document.querySelector("#victory-screen h2");
+        if (victoryH2) victoryH2.textContent = `You have unlocked all 25 discoveries and completed the game!`;
+        const timeRemainingSpan = document.getElementById("time-remaining-span");
+        const timeRemainingP = document.getElementById("time-remaining-p");
+        if (timeRemainingSpan && timeRemainingP) {
+            if (currentDifficulty && currentDifficulty !== 'casual') {
+                // show remaining timer for timed difficulties
+                timeRemainingSpan.textContent = `Time Remaining: ${formatTime(typeof timerRemainingMs === 'number' ? timerRemainingMs : 0)}`;
+                timeRemainingSpan.classList.remove('hidden');
+                timeRemainingSpan.style.display = '';
+                timeRemainingSpan.setAttribute('aria-hidden', 'false');
+                timeRemainingP.classList.remove('hidden');
+                timeRemainingP.style.display = '';
+                timeRemainingP.setAttribute('aria-hidden', 'false');
+            } else {
+                // hide when not timed
+                timeRemainingSpan.classList.add('hidden');
+                timeRemainingSpan.style.display = 'none';
+                timeRemainingSpan.setAttribute('aria-hidden', 'true');
+                timeRemainingP.classList.add('hidden');
+                timeRemainingP.style.display = 'none';
+                timeRemainingP.setAttribute('aria-hidden', 'true');
+            }
         }
+
     }
+
 }
 
 // Updates the Progress Bar
-function updateProgress() {
-    const percent = completed / 25 * 100;
+    function updateProgress() {
+        const percent = completed / 25 * 100;
 
-    document.getElementById("progressBarFill").style.width = percent + "%";
-    document.getElementById("progressText").textContent = `${completed}/25 Discoveries Unlocked`;
+        document.getElementById("progressBarFill").style.width = percent + "%";
+        document.getElementById("progressText").textContent = `${completed}/25 Discoveries Unlocked`;
+    }
+
+    // Displays a milestone message when the score reaches 3750 points
+    function showMilestoneIfReached() {
+        const progressSection = document.querySelector(".progress-section");
+        if (!progressSection) return;
+
+        const existing = document.getElementById("milestone-message");
+
+        if (score < 3750) {
+            if (existing) existing.remove();
+            return;
+        }
+
+        if (existing) return;
+
+        const message = document.createElement("p");
+        message.id = "milestone-message";
+        message.textContent = "You have reached 3750 points! Keep going!";
+        progressSection.appendChild(message);
+    }
+
+    // Check once on load in case score is already high (e.g. restored state)
+    showMilestoneIfReached();
+
+
+    // Wire the difficulty select element
+    if (difficultySelect) {
+        // Ensure the initial display state is correct
+        updateTimerDisplay();
+        difficultySelect.addEventListener('change', (e) => {
+            const newVal = difficultySelect.value;
+            const confirmed = window.confirm('Switching difficulty will reset the game. Confirm to reset and start the selected difficulty.');
+            if (!confirmed) {
+                // revert selection
+                difficultySelect.value = currentDifficulty;
+                return;
+            }
+            currentDifficulty = newVal;
+            resetGame();
+        });
+    }
+
+// Re-enable difficulty selector when game resets
+if (difficultySelect) {
+    difficultySelect.disabled = false;
+    difficultySelect.setAttribute('aria-disabled', 'false');
+    difficultySelect.value = currentDifficulty;
 }

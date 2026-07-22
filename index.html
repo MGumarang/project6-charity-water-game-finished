@@ -24,7 +24,17 @@
 
     <!-- Progress Bar + Score -->
     <section class="progress-section">
-        <p class="score-text" id="scoreText">Score: 0 / 7500</p>
+        <!-- Difficulty Selector -->
+        <select id="difficulty-select">
+            <option value="casual">Casual</option>
+            <option value="normal">Timed: 3 minutes</option>
+            <option value="hard">Timed: 2 minutes</option>
+        </select>
+        <div class="score-timer-section">
+            <p class="score-text" id="scoreText">Score: 0 / 7500</p>
+            <p class="timer-text" id="timerText">Time: 00:00</p>
+        </div>
+        
         <div class="progress-bar">
             <p class="progress-text" id="progressText">0/25 Discoveries Unlocked</p>
             <div class="progress-bar-fill" id="progressBarFill"></div>
@@ -51,7 +61,6 @@
                         <button class="question-button" data-category="Dorm Life" data-value="400" data-question="4">400</button>
                         <button class="question-button" data-category="Dorm Life" data-value="500" data-question="5">500</button>
                     </div>
-                </div>
             </article>
 
             <article class="accordion-item category-card">
@@ -163,9 +172,16 @@
         <h1>Congratulations!</h1>
         <h2>You have unlocked all 25 discoveries and completed the game!</h2>
         <p>Your final score is: <span id="final-score">0/7500</span></p>
+        <p id="time-remaining-p">Time remaining: <span id="time-remaining-span">00:00</span></p>
         <p id="charity-water-mission">Throughout your journey, you've learned about the uses of water, and how water is used in ways that you may not have considered. You've also learned about the importance of clean water for everyday life and the impact of accessible water sources.</p>
+        <p>charity: water is a non-profit organization that provides clean and safe drinking water to people in developing countries. Every attention to the topic of water accessibility is a step towards a more sustainable future.</p>
         <a href="https://www.charitywater.org/" target="_blank" id="charity-water-link">If this game has inspired you to take action, learn more about Charity: Water</a>
     </section>
+
+    <!-- Footer Section -->
+    <footer>
+        <p>Created by Matthew G. for <a href="https://www.charitywater.org/" target="_blank">Charity: Water</a></p>
+    </footer>
 
     <script src="script.js"></script>
 </body>
