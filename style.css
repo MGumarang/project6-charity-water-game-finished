@@ -19,6 +19,7 @@ body {
     max-width: 1400px;
     margin: auto;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    transition: background-color 0.45s ease, color 0.45s ease;
 }
 
 /* Header styles */
@@ -105,13 +106,12 @@ header img {
     width: 0;
     height: 100%;
     background-color: #77a8bb;
-    transition: width 0.3s ease;
+    transition: width 0.3s ease, background-color 0.3s ease;;
 }
 
 /* Changes the color of the progress bar when full */
 .progress-bar-fill.victory {
     background-color: #4fcb53;
-    transition: color 0.3s ease;
 }
 
 /* Positions the progress text with a higher stack order */
@@ -275,11 +275,12 @@ button.back {
 
 #question-title {
     margin: 20px 0;
+    font-weight: 400;
 }
 
 p#question-text {
     font-size: 2.5rem;
-    font-weight: 500;
+    font-weight: bold;
 }
 
 #answers {
@@ -456,6 +457,25 @@ button.answer.correct {
     transition: background-color 300ms ease, color 300ms ease;
 }
 
+/* CSS Selectors for all three screens */
+#game-board, #question-screen, #victory-screen {
+    /* Fade-in animation for screens */
+    animation: fadeIn .45s ease;
+    transition: background-color 0.45s ease, color 0.45s ease;
+}
+
+/* CSS code for the fade-in animation */
+@keyframes fadeIn {
+    from { 
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to   { 
+        opacity: 1;
+        transform: translateY(0); 
+    }
+}
+
 
 /* Responsive Layout. Collapses accordions and enables accordion behavior */
 @media (max-width:1100px){
@@ -501,11 +521,11 @@ button.answer.correct {
 
     #question-title {
         margin: 20px 0;
-        font-size: 2.5rem;
+        font-size: 2rem;
     }
 
     p#question-text {
-        font-size: 1.8rem;
+        font-size: 2.25rem;
     }
 
     #milestone-message {

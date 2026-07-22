@@ -728,7 +728,7 @@ function finishQuestion() {
         if (timeRemainingSpan && timeRemainingP) {
             if (currentDifficulty && currentDifficulty !== 'casual') {
                 // show remaining timer for timed difficulties
-                timeRemainingSpan.textContent = `Time Remaining: ${formatTime(typeof timerRemainingMs === 'number' ? timerRemainingMs : 0)}`;
+                timeRemainingSpan.textContent = `${formatTime(typeof timerRemainingMs === 'number' ? timerRemainingMs : 0)}`;
                 timeRemainingSpan.classList.remove('hidden');
                 timeRemainingSpan.style.display = '';
                 timeRemainingSpan.setAttribute('aria-hidden', 'false');
